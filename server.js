@@ -50,15 +50,39 @@ const start = () => {
 };
 
 // get all depts()
-
+function getAllDept() {
+  db.query('SELECT * FROM departments', function (err, results) {
+    console.table(results);
+    start();
+  });
+};
 // get all roles()
-
+function getAllRole() {
+  db.query('SELECT * FROM roles', function (err, results) {
+    console.table(results);
+    start();
+  });
+};
 // get all empy()
-
+function getAllEmp() {
+  db.query('SELECT * FROM employees', function (err, results) {
+    console.table(results);
+    start();
+  });
+};
 // add dept()
+function addDept() {
 
+};
 // add role()
+function addRole() {
 
+};
 // add emp()
+function addEmp() {
 
+};
 // update role()
+function updateEmpRole() {
+
+};
