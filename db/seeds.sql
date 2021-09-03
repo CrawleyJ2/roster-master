@@ -1,4 +1,4 @@
-
+USE roster_master;
 
 INSERT INTO departments (department_name)
 VALUES
