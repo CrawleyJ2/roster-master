@@ -2,6 +2,7 @@
 const inquirer = require ('inquirer');
 const cTable = require('console.table');
 const db = require('./db/connection');
+
 // database connection
 db.connect(err => {
   if (err) throw err;
@@ -89,7 +90,7 @@ function addDept() {
         if (nameInput) {
           return true;
         } else {
-          console.log('Department name cannot be empty');
+          console.log('Department name cannot be empty!');
           return false;
         }
       }
@@ -98,14 +99,66 @@ function addDept() {
     const params = data.department_name;
     db.query('INSERT INTO departments (department_name) values (?)', params, (err, results) => {
       if (err) throw (err);
-      console.log('Department has been added');
+      console.log('Department has been added.');
       start();
     });
   });
 };
 // add role()
 function addRole() {
-
+  db.query('SELECT * FROM departments', (err, results) => {
+    if (err) throw (err);
+    const department_name = results.map(({ department_name, department_id }) => ({
+      value: department_id,
+      name: `${department_name}`
+    }));
+    console.log(department_name);
+    inquirer.prompt([
+      {
+        type: 'input',
+        name: 'title',
+        message: 'What is title of the role you are adding?',
+        validate: titleInput => {
+          if (titleInput) {
+            return true;
+          } else {
+            console.log('Role cannot be empty!');
+            return false;
+          }
+        }
+      },
+      {
+        type: 'input',
+        name: 'salary',
+        message: 'What is the pay rate for this role?',
+        validate: salaryInput => {
+          if (salaryInput) {
+            return true;
+          } else {
+            console.log('Salary cannot be empty!');
+            return false;
+          }
+        }
+      },
+      {
+        type: 'list',
+        name: 'department',
+        message: 'Which department does this role fall under?',
+        choices: department_name
+      }
+    ]).then(data => {
+      const params = [
+        data.title,
+        data.salary,
+        data.department
+      ];
+      db.query('INSERT INTO roles (title, salary, department_id) values (?,?,?)', params, (err, results) => {
+        if (err) throw (err);
+        console.log('Role has been added');
+        start();
+      });
+    });
+  });
 };
 // add emp()
 function addEmp() {
