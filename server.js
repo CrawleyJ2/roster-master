@@ -63,6 +63,7 @@ function getAllDept() {
     start();
   });
 };
+
 // get all roles()
 function getAllRole() {
   db.query('SELECT * FROM roles', function (err, results) {
@@ -71,6 +72,7 @@ function getAllRole() {
     start();
   });
 };
+
 // get all empy()
 function getAllEmp() {
   db.query('SELECT * FROM employees', function (err, results) {
@@ -79,6 +81,7 @@ function getAllEmp() {
     start();
   });
 };
+
 // add dept()
 function addDept() {
   inquirer.prompt(
@@ -104,6 +107,7 @@ function addDept() {
     });
   });
 };
+
 // add role()
 function addRole() {
   db.query('SELECT * FROM departments', (err, results) => {
@@ -147,12 +151,12 @@ function addRole() {
         choices: department_name
       }
     ]).then(data => {
-      const params = [
+      const newRoleData = [
         data.title,
         data.salary,
         data.department
       ];
-      db.query('INSERT INTO roles (title, salary, department_id) values (?,?,?)', params, (err, results) => {
+      db.query('INSERT INTO roles (title, salary, department_id) VALUES (?, ?, ?)', newRoleData, (err, results) => {
         if (err) throw (err);
         console.log('Role has been added');
         start();
@@ -160,52 +164,71 @@ function addRole() {
     });
   });
 };
+
 // add emp()
 function addEmp() {
-  inquirer.prompt([
-    {
-      type: 'input',
-      name: 'first_name',
-      message: 'What is the first name of the employee?',
-      validate: first_nameInput => {
-        if (first_nameInput) {
-          return true;
-        } else {
-          console.log('First name cannot be empty!');
-          return false;
+  db.query('SELECT roles.role_id, roles.title FROM roles', (err, results) => {
+    if (err) throw (err);
+    const roles = results.map(roles => ({ value: roles.role_id, name: roles.title }));
+    db.query('SELECT * FROM employees', (err, results) => {
+      if (err) throw (err);
+      const managers = results.map(employees => ({ value: employees.employee_id, name: employees.first_name + ' ' + employees.last_name }));
+      return inquirer.prompt([
+        {
+          type: 'input',
+          name: 'first_name',
+          message: 'What is the first name of the employee?',
+          validate: first_nameInput => {
+            if (first_nameInput) {
+              return true;
+            } else {
+              console.log('First name cannot be empty!');
+              return false;
+            }
+          }
+        },
+        {
+          type: 'input',
+          name: 'last_name',
+          message: 'What is the last name of the employee?',
+          validate: last_nameInput => {
+            if (last_nameInput) {
+              return true;
+            } else {
+              console.log('Last name cannot be empty!');
+              return false;
+            }
+          }
+        },
+        {
+          type: 'list',
+          name: 'role_id',
+          message: 'What role is the employee working?',
+          choices: roles
+        },
+        {
+          type: 'list',
+          name: 'manager_id',
+          message: 'Who is the manager for this employee?',
+          choices: managers
         }
-      }
-    },
-    {
-      type: 'input',
-      name: 'last_name',
-      message: 'What is the last name of the employee?',
-      validate: last_nameInput => {
-        if (last_nameInput) {
-          return true;
-        } else {
-          console.log('Last name cannot be empty!');
-          return false;
-        }
-      }
-    },
-    {
-      type: 'input',
-      name: 'roleId',
-      message: 'What role is the employee working?',
-      validate: (roleInput) => {
-        if (roleInput) {
-          return true;
-        } else {
-          console.log('Role cannot be empty!');
-          return false;
-        }
-      }
-    }
-  ]) // maybe pull managers from db and have prompt to select manager from the list?
-
-  // then push new employee to db
+      ]).then(data => {
+        const newEmpData = [
+          data.first_name,
+          data.last_name,
+          data.role_id,
+          data.manager_id
+        ];
+        db.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)`, newEmpData, (err, results) => {
+          if (err) throw (err);
+          console.log(`New employee added!`);
+        });
+        start();
+      });
+    });
+  });
 };
+
 // update role()
 function updateEmpRole() {
   db.query(`SELECT * FROM employees, CONCAT(employee.first_name, ' ', employee.last_name) AS name`, (err, results) => {
@@ -225,7 +248,7 @@ function updateEmpRole() {
         type: 'input',
         name: 'newEmpRole',
         message: 'What is the new role for this employee?',
-        
+
       }
 
     // enter new role
