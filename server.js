@@ -189,18 +189,47 @@ function addEmp() {
         }
       }
     },
-    // role 
+    {
+      type: 'input',
+      name: 'roleId',
+      message: 'What role is the employee working?',
+      validate: (roleInput) => {
+        if (roleInput) {
+          return true;
+        } else {
+          console.log('Role cannot be empty!');
+          return false;
+        }
+      }
+    }
+  ]) // maybe pull managers from db and have prompt to select manager from the list?
 
-    // manager
-  ])
+  // then push new employee to db
 };
 // update role()
 function updateEmpRole() {
-  inquirer.prompt([
-    // find employee
+  db.query(`SELECT * FROM employees, CONCAT(employee.first_name, ' ', employee.last_name) AS name`, (err, results) => {
+    if (err) throw (err);
+    const employees = results.map(({ employee_id, name }) => ({
+      value: employee_id,
+      name: `${name}`
+    }));
+    inquirer.prompt([
+      {
+        type: 'list',
+        name: 'employee_list',
+        message: 'Select the employee you would like to update:',
+        choices: employees
+      },
+      {
+        type: 'input',
+        name: 'newEmpRole',
+        message: 'What is the new role for this employee?',
+        
+      }
 
     // enter new role
   ])
   // .then to update db with employee's new role
   // start();
-};
+})};
