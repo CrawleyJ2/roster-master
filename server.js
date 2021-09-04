@@ -162,9 +162,45 @@ function addRole() {
 };
 // add emp()
 function addEmp() {
+  inquirer.prompt([
+    {
+      type: 'input',
+      name: 'first_name',
+      message: 'What is the first name of the employee?',
+      validate: first_nameInput => {
+        if (first_nameInput) {
+          return true;
+        } else {
+          console.log('First name cannot be empty!');
+          return false;
+        }
+      }
+    },
+    {
+      type: 'input',
+      name: 'last_name',
+      message: 'What is the last name of the employee?',
+      validate: last_nameInput => {
+        if (last_nameInput) {
+          return true;
+        } else {
+          console.log('Last name cannot be empty!');
+          return false;
+        }
+      }
+    },
+    // role 
 
+    // manager
+  ])
 };
 // update role()
 function updateEmpRole() {
+  inquirer.prompt([
+    // find employee
 
+    // enter new role
+  ])
+  // .then to update db with employee's new role
+  // start();
 };
