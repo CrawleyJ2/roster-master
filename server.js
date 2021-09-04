@@ -3,12 +3,17 @@ const inquirer = require ('inquirer');
 const cTable = require('console.table');
 const db = require('./db/connection');
 // database connection
+db.connect(err => {
+  if (err) throw err;
+  console.log('Roster Master connected');
+  start();
+});
 
 // inquirer prompt to start process
 const start = () => {
   inquirer.prompt({
     type: 'list',
-    name: 'start menu',
+    name: 'starter',
     message: 'What would you like to do?',
     choices: [
       'View all departments', 
@@ -21,25 +26,25 @@ const start = () => {
       'Quit']
   }).then(res => {
     // if all depts, function to get all depts
-    if (res.choices === 'View all departments') {
+    if (res.starter === 'View all departments') {
       getAllDept();
     // else if all roles, get all roles
-    } else if (res.choices === 'View all roles') {
+    } else if (res.starter === 'View all roles') {
       getAllRole();
     // else if all employees, get all employees
-    } else if (res.choices === 'View all employees') {
+    } else if (res.starter === 'View all employees') {
       getAllEmp();
     // else if add dept, function to add dept
-    } else if (res.choices === 'Add a department') {
+    } else if (res.starter === 'Add a department') {
       addDept();
     // else if add role, function to add role
-    } else if (res.choices === 'Add a role') {
+    } else if (res.starter === 'Add a role') {
       addRole();
     // else if add emp, function to add emp
-    } else if (res.choices === 'Add an employee') {
+    } else if (res.starter === 'Add an employee') {
       addEmp();
     // else if update role, function to update role
-    } else if (res.choices === 'Update employee role') {
+    } else if (res.starter === 'Update employee role') {
       updateEmpRole();
     // else exit process, console log a farewell
     } else {
@@ -53,6 +58,7 @@ const start = () => {
 function getAllDept() {
   db.query('SELECT * FROM departments', function (err, results) {
     console.table(results);
+    if (err) throw (err);
     start();
   });
 };
@@ -60,6 +66,7 @@ function getAllDept() {
 function getAllRole() {
   db.query('SELECT * FROM roles', function (err, results) {
     console.table(results);
+    if (err) throw (err);
     start();
   });
 };
@@ -67,12 +74,34 @@ function getAllRole() {
 function getAllEmp() {
   db.query('SELECT * FROM employees', function (err, results) {
     console.table(results);
+    if (err) throw (err);
     start();
   });
 };
 // add dept()
 function addDept() {
-
+  inquirer.prompt(
+    {
+      type: 'input',
+      name: 'department_name',
+      message: 'What is the new department name?',
+      validate: nameInput => {
+        if (nameInput) {
+          return true;
+        } else {
+          console.log('Department name cannot be empty');
+          return false;
+        }
+      }
+    }
+  ).then(data => {
+    const params = data.department_name;
+    db.query('INSERT INTO departments (department_name) values (?)', params, (err, results) => {
+      if (err) throw (err);
+      console.log('Department has been added');
+      start();
+    });
+  });
 };
 // add role()
 function addRole() {

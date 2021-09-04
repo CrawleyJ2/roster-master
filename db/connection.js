@@ -3,8 +3,8 @@ const dotenv = require('dotenv').config();
 
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
-  username: process.env.DB_USER,
-  password: process.env.PASSWORD,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
   database: 'roster_master'
 });
 
