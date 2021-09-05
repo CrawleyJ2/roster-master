@@ -231,28 +231,34 @@ function addEmp() {
 
 // update role()
 function updateEmpRole() {
-  db.query(`SELECT * FROM employees, CONCAT(employee.first_name, ' ', employee.last_name) AS name`, (err, results) => {
+  db.query(`SELECT * FROM employees`, (err, results) => {
     if (err) throw (err);
-    const employees = results.map(({ employee_id, name }) => ({
-      value: employee_id,
-      name: `${name}`
-    }));
-    inquirer.prompt([
-      {
-        type: 'list',
-        name: 'employee_list',
-        message: 'Select the employee you would like to update:',
-        choices: employees
-      },
-      {
-        type: 'input',
-        name: 'newEmpRole',
-        message: 'What is the new role for this employee?',
+    const employees = results.map(employees => ({ value: employees.employee_id, name: employees.first_name + ' ' + employees.last_name }));
+    db.query(`SELECT * FROM roles`, (err, results) => {
+      if (err) throw (err);
+      const roles = results.map(roles => ({ value: roles.role_id, name: roles.title }));
+      return inquirer.prompt([
+        {
+          type: 'list',
+          name: 'employee_list',
+          message: 'Select the employee you would like to update:',
+          choices: employees
+        },
+        {
+          type: 'list',
+          name: 'newEmpRole',
+          message: 'What is the new role for this employee?',
+          choices: roles
 
-      }
-
-    // enter new role
-  ])
-  // .then to update db with employee's new role
-  // start();
-})};
+        }
+      ]).then(data => {
+        const newRoleData = [data.employee_list, data.newEmpRole];
+        db.query(`UPDATE employees SET role_id = ? WHERE employee_id = ?`, newRoleData, (err, results) => {
+          if (err) throw (err);
+          console.log('Employee information updated.');
+        });
+        start();
+      })
+    })
+  });
+};
