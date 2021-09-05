@@ -66,7 +66,7 @@ function getAllDept() {
 
 // get all roles()
 function getAllRole() {
-  db.query('SELECT * FROM roles', function (err, results) {
+  db.query('SELECT * FROM roles LEFT JOIN departments ON roles.department_id = departments.department_id', function (err, results) {
     console.table(results);
     if (err) throw (err);
     start();
@@ -75,7 +75,7 @@ function getAllRole() {
 
 // get all empy()
 function getAllEmp() {
-  db.query('SELECT * FROM employees', function (err, results) {
+  db.query('SELECT employees.employee_id, employees.first_name, employees.last_name, roles.title, roles.salary, departments.department_name FROM employees LEFT JOIN roles ON employees.role_id = roles.role_id LEFT JOIN departments ON roles.department_id = departments.department_id', function (err, results) {
     console.table(results);
     if (err) throw (err);
     start();
