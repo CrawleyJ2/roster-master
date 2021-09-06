@@ -38,7 +38,7 @@
 
   ## Walkthrough
 
-  //pending link to walk through video//
+For a walkthrough video of using this application click [here](https://drive.google.com/file/d/14jHs1YWcS78cCLGysiGDjCKCNECw4d0h/view?usp=sharing).
 
   ## License
 
